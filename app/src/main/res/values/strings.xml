@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Stock Hawk</string>
+
+    <string name="action_example">Example action</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_change_units">Change Units</string>
+    <string name="symbol_search">Symbol Search</string>
+    <string name="content_test">Search for a Stock Symbol</string>
+    <string name="input_hint">FB</string>
+    <string name="input_prefill"></string>
+    <string name="network_toast">No Internet connection to process your request</string>
+
+    <!-- Empty Stock Database -->
+    <string name="empty_stock_list">No Stock Available right now</string>
+    <string name="empty_stock_list_no_network">The network is not available to fetch Stock data.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_stock_detail">StockDetail</string>
+    <string name="stock_detail_title">Stock</string>
+    <string name="stock_detail_tab1">5DAYS</string>
+    <string name="stock_detail_tab2">2WEEKS</string>
+    <string name="stock_detail_tab3">1MONTH</string>
+    <string name="stock_detail_tab_header">NASDAQ: %1$s</string>
+    <string name="stock_already_saved">This stock is already saved!</string>
+    <string name="add_new_stock">You want to add new Stock</string>
+
+</resources>
