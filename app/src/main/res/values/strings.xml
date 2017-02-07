@@ -25,5 +25,9 @@
     <string name="stock_detail_tab_header">NASDAQ: %1$s</string>
     <string name="stock_already_saved">This stock is already saved!</string>
     <string name="add_new_stock">You want to add new Stock</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="symbol">Symbol</string>
+    <string name="current_price">Current Bid Price</string>
+    <string name="action_search">Search</string>
 
 </resources>

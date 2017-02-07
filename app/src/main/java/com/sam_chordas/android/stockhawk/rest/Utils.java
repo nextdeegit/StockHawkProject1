@@ -1,16 +1,16 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
+
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
-import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 10/8/15.
@@ -21,7 +21,15 @@ public class Utils {
 
   public static boolean showPercent = true;
 
-  public static ArrayList quoteJsonToContentVals(String JSON){
+  static boolean detected = false;
+
+  public static boolean isRemoteFailureDetected()
+  {
+    return Utils.detected;
+  }
+
+  public static ArrayList quoteJsonToContentVals(String JSON) {
+    detected = false;
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
     JSONObject jsonObject = null;
     JSONArray resultsArray = null;
@@ -32,7 +40,7 @@ public class Utils {
         int count = Integer.parseInt(jsonObject.getString("count"));
         if (count == 1){
           jsonObject = jsonObject.getJSONObject("results")
-              .getJSONObject("quote");
+                  .getJSONObject("quote");
           batchOperations.add(buildBatchOperation(jsonObject));
         } else{
           resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
@@ -45,15 +53,19 @@ public class Utils {
           }
         }
       }
-    } catch (JSONException e){
+    } catch (Exception e){
       Log.e(LOG_TAG, "String to JSON failed: " + e);
     }
+
     return batchOperations;
   }
 
-  public static String truncateBidPrice(String bidPrice){
-    bidPrice = String.format("%.2f", Float.parseFloat(bidPrice));
-    return bidPrice;
+  public static String truncateBidPrice(String bidPrice)
+  {
+    if (!bidPrice.equals("null"))
+      return String.format("%.2f", Float.parseFloat(bidPrice));
+    else
+      return "0.0";
   }
 
   public static String truncateChange(String change, boolean isPercentChange){
@@ -73,15 +85,21 @@ public class Utils {
     return change;
   }
 
-  public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
+  public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject)
+  {
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-        QuoteProvider.Quotes.CONTENT_URI);
+            QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
-      builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
+
+      String truncatePrice = jsonObject.getString("Bid");
+      if (truncatePrice.equals("null"))
+        detected = true;
+//System.out.println("utils: detected set true");}
+      builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(truncatePrice));
       builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
-          jsonObject.getString("ChangeinPercent"), true));
+              jsonObject.getString("ChangeinPercent"), true));
       builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
       builder.withValue(QuoteColumns.ISCURRENT, 1);
       if (change.charAt(0) == '-'){
@@ -95,4 +113,5 @@ public class Utils {
     }
     return builder.build();
   }
+
 }

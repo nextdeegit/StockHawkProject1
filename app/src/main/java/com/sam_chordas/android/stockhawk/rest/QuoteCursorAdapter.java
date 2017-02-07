@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,6 +17,8 @@ import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperAdapter;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperViewHolder;
+
+import static com.sam_chordas.android.stockhawk.service.StockTaskService.ACTION_DATA_UPDATED;
 
 /**
  * Created by sam_chordas on 10/6/15.
@@ -38,7 +41,7 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
   public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
     robotoLight = Typeface.createFromAsset(mContext.getAssets(), "fonts/Roboto-Light.ttf");
     View itemView = LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.list_item_quote, parent, false);
+            .inflate(R.layout.list_item_quote, parent, false);
     ViewHolder vh = new ViewHolder(itemView);
     return vh;
   }
@@ -51,23 +54,25 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     if (cursor.getInt(cursor.getColumnIndex("is_up")) == 1){
       if (sdk < Build.VERSION_CODES.JELLY_BEAN){
         viewHolder.change.setBackgroundDrawable(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }else {
         viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_green));
       }
     } else{
       if (sdk < Build.VERSION_CODES.JELLY_BEAN) {
         viewHolder.change.setBackgroundDrawable(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       } else{
         viewHolder.change.setBackground(
-            mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
+                mContext.getResources().getDrawable(R.drawable.percent_change_pill_red));
       }
     }
     if (Utils.showPercent){
       viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("percent_change")));
-    } else{
+    }
+    else
+    {
       viewHolder.change.setText(cursor.getString(cursor.getColumnIndex("change")));
     }
   }
@@ -78,19 +83,18 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     String symbol = c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
     mContext.getContentResolver().delete(QuoteProvider.Quotes.withSymbol(symbol), null, null);
     notifyItemRemoved(position);
+
+    Intent updateIntent = new Intent();
+    updateIntent.setAction(ACTION_DATA_UPDATED);
+    mContext.sendBroadcast(updateIntent);
   }
 
   @Override public int getItemCount() {
     return super.getItemCount();
   }
-  public String getSymbol(int position) {
-    Cursor c = getCursor();
-    c.moveToPosition(position);
-    return c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
-  }
 
   public static class ViewHolder extends RecyclerView.ViewHolder
-      implements ItemTouchHelperViewHolder, View.OnClickListener{
+          implements ItemTouchHelperViewHolder, View.OnClickListener{
     public final TextView symbol;
     public final TextView bidPrice;
     public final TextView change;
