@@ -9,3 +9,4 @@ This app can perform the following functionalitites:
 
 - Search and add companies to monitor stock trend
 - See historical charts for the company
+- Stock widget
